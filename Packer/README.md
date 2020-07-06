@@ -6,4 +6,4 @@ Contenue de l'image:<br/>
 - Installation de FSLogix avec les paramétrages de la base de registre Windows (Profiles Enabled;DeleteLocalProfileWhenVHDShouldApply;VHDLocations)
 - Installation de VLC
 
-Exemple : ``packer build Wvd-Image.json``
+Exemple : ``packer build .\Wvd-Image.json``

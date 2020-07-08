@@ -20,7 +20,8 @@ Exemple : ``packer build .\Wvd-Image.json``<br/>
 
 Explications des variables:<br/>
 
-``"variables": {  
+```
+"variables": {  
         "sp_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //ID du "Servive Principal Name"         
         "sp_Secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //Secret du "Servive Principal Name"
         "tenant_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //Id du "Tenant AD"
@@ -41,4 +42,6 @@ Explications des variables:<br/>
 
         "Share_Profils_location":"storagefslogix.file.core.windows.net", //paramétrage de FSLogix (ex:\\storagefslogix.file.core.windows.net)
         "Share_Profils_folder":"profiles" //paramétrage de FSLogix (ex: \\storagefslogix.file.core.windows.net\profiles)
-    }``
+    }
+
+```

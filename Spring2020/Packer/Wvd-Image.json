@@ -1,25 +1,25 @@
 {
     "variables": {  
-        "sp_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //ID du "Servive Principal Name"         
-        "sp_Secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //Secret du "Servive Principal Name"
-        "tenant_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //Id du "Tenant AD"
-        "subscription_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //ID de l'abonement
+        "sp_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",    
+        "sp_Secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "tenant_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "subscription_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
 
-        "image_Rgname":"RG-Image-Packer", //Resource group de l'image
-        "image_Name":"WVD-FSlogix-VLC-Image-v0.5-test", //Nom de l'image
-        "image_location":"East US 2", //Region de l'image
-        "image_size":"Standard_D2s_v3", // Template matériel de l'image   
+        "image_Rgname":"RG-Image-Packer",
+        "image_Name":"WVD-FSlogix-VLC-Image-v0.5-test",
+        "image_location":"East US 2",
+        "image_size":"Standard_D2s_v3",
 
-        "Os":"Windows", // Type d'OS
-        "Publisher":"MicrosoftWindowsDesktop", //Publisher de l'image
-        "Offer":"office-365", //Famille de l'OS
-        "SKU":"19h2-evd-o365pp", // Image
+        "Os":"Windows",
+        "Publisher":"MicrosoftWindowsDesktop",
+        "Offer":"office-365",
+        "SKU":"19h2-evd-o365pp",
 
-        "dept_tag":"Engineering", //Tag 1
-        "task_tag":"Image deployment", //Tag 2
+        "dept_tag":"Engineering",
+        "task_tag":"Image deployment",
 
-        "Share_Profils_location":"storagefslogix.file.core.windows.net", //paramétrage de FSLogix (ex:\\storagefslogix.file.core.windows.net)
-        "Share_Profils_folder":"profiles" //paramétrage de FSLogix (ex: \\storagefslogix.file.core.windows.net\profiles)
+        "Share_Profils_location":"storagefslogix.file.core.windows.net",
+        "Share_Profils_folder":"profiles"
     },
     "builders": [
         {
@@ -49,8 +49,9 @@
     ],
     "provisioners": [
         {
+            "_comment": "Installation du gestionnaire de package Chocolatey",
             "type": "powershell",
-            "inline": [ // Installation du gestionnaire de package "Chocolatey"
+            "inline": [
                 "$ErrorActionPreference='Stop'",
                 "Invoke-Expression ((New-Object -TypeName net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
                 "& choco feature enable -n allowGlobalConfirmation",
@@ -58,56 +59,63 @@
             ]
         },
         {
+            "_comment": "nstallation de FSLogix avec 'Chocolatey'",
             "type": "powershell",
-            "inline": [ // Installation de FSLogix avec "Chocolatey"
+            "inline": [ 
                 "$ErrorActionPreference='Stop'",
                 "& choco install fslogix",
                 "Write-Host \"fslogix Installed.\""
             ]
         },
         {
-            "type": "powershell",
-            "inline": [ // Ajout de la clé de registre "Profiles" (FSLogix)
+            "_comment": "Ajout de la clé de registre 'Profiles' (FSLogix)",
+            "type": "powershell",            
+            "inline": [ 
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles",
                 "Write-Host \"fslogix Profiles.\""
             ]
         },
         {
+            "_comment": "Ajout d'un parametre 'Enabled' de la clé de registre 'Profiles' (FSLogix)",
             "type": "powershell",
-            "inline": [ // Ajout d'un parametre "Enabled" de a clé de registre "Profiles" (FSLogix)
+            "inline": [
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v Enabled /t REG_DWORD /d 0x00000001 ",
                 "Write-Host \"fslogix Profiles Enabled.\""
             ]
         },
         {
+            "_comment": "Ajout d'un parametre 'DeleteLocalProfileWhenVHDShouldApply' de la clé de registre 'Profiles' (FSLogix)",
             "type": "powershell",
-            "inline": [ // Ajout d'un parametre "DeleteLocalProfileWhenVHDShouldApply" de a clé de registre "Profiles" (FSLogix)
+            "inline": [
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v DeleteLocalProfileWhenVHDShouldApply /t REG_DWORD /d 0x00000001 ",
                 "Write-Host \"fslogix Profiles DeleteLocalProfileWhenVHDShouldApply.\""
             ]
         },
         {
+            "_comment": "Ajout d'un parametre 'VHDLocations' de la clé de registre 'Profiles' (FSLogix). Location du partage SMB",
             "type": "powershell",
-            "inline": [// Ajout d'un parametre "VHDLocations" de a clé de registre "Profiles" (FSLogix). Location du partage SMB
+            "inline": [
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v VHDLocations /t REG_MULTI_SZ /d \\\\{{user `Share_Profils_location`}}\\{{user `Share_Profils_folder`}} ",
                 "Write-Host \"fslogix Profiles VHDLocations .\""
             ]
         },
         {
+            "_comment": "Installation de 'VLC'",
             "type":"powershell",
-            "inline":[ // Installation de VLC
+            "inline":[
                 "$ErrorActionPreference='Stop'",
                 "& choco install vlc",
                 "Write-Host \"vlc Installed.\""
             ]
         },
         {
+            "_comment": "Sysprep !",
             "type": "powershell",
-            "inline": [ // Sysprep
+            "inline": [ 
                 "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit",
                 "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Write-Output $imageState.ImageState; Start-Sleep -s 10  } else { break } }"
             ]

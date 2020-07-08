@@ -18,7 +18,7 @@ Voir l'exemple ``.\Wvd-Image.json``<br/>
 Exemple : ``packer build .\Wvd-Image.json``<br/>
 
 
-Explications des variables:<br/>
+Explications :<br/>
 
 ```
 "variables": {  
@@ -43,5 +43,81 @@ Explications des variables:<br/>
         "Share_Profils_location":"storagefslogix.file.core.windows.net", //paramétrage de FSLogix (ex:\\storagefslogix.file.core.windows.net)
         "Share_Profils_folder":"profiles" //paramétrage de FSLogix (ex: \\storagefslogix.file.core.windows.net\profiles)
     }
+```
+```
+"provisioners": [
+        {
+            // "Installation du gestionnaire de package Chocolatey",
+            "type": "powershell",
+            "inline": [
+                "$ErrorActionPreference='Stop'",
+                "Invoke-Expression ((New-Object -TypeName net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
+                "& choco feature enable -n allowGlobalConfirmation",
+                "Write-Host \"Chocolatey Installed.\""
+            ]
+        },
+        {
+            // "installation de FSLogix avec Chocolatey",
+            "type": "powershell",
+            "inline": [ 
+                "$ErrorActionPreference='Stop'",
+                "& choco install fslogix",
+                "Write-Host \"fslogix Installed.\""
+            ]
+        },
+        {
+            // "Ajout de la clé de registre Profiles (FSLogix)",
+            "type": "powershell",            
+            "inline": [ 
+                "$ErrorActionPreference='Stop'",
+                "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles",
+                "Write-Host \"fslogix Profiles.\""
+            ]
+        },
+        {
+            // "Ajout d'un parametre Enabled de la clé de registre Profiles (FSLogix)",
+            "type": "powershell",
+            "inline": [
+                "$ErrorActionPreference='Stop'",
+                "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v Enabled /t REG_DWORD /d 0x00000001 ",
+                "Write-Host \"fslogix Profiles Enabled.\""
+            ]
+        },
+        {
+            // "Ajout d'un parametre DeleteLocalProfileWhenVHDShouldApply de la clé de registre Profiles (FSLogix)",
+            "type": "powershell",
+            "inline": [
+                "$ErrorActionPreference='Stop'",
+                "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v DeleteLocalProfileWhenVHDShouldApply /t REG_DWORD /d 0x00000001 ",
+                "Write-Host \"fslogix Profiles DeleteLocalProfileWhenVHDShouldApply.\""
+            ]
+        },
+        {
+            // "Ajout d'un parametre VHDLocations de la clé de registre Profiles (FSLogix). Location du partage SMB",
+            "type": "powershell",
+            "inline": [
+                "$ErrorActionPreference='Stop'",
+                "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v VHDLocations /t REG_MULTI_SZ /d \\\\{{user `Share_Profils_location`}}\\{{user `Share_Profils_folder`}} ",
+                "Write-Host \"fslogix Profiles VHDLocations .\""
+            ]
+        },
+        {
+            // "Installation de VLC",
+            "type":"powershell",
+            "inline":[
+                "$ErrorActionPreference='Stop'",
+                "& choco install vlc",
+                "Write-Host \"vlc Installed.\""
+            ]
+        },
+        {
+           // "Sysprep",
+            "type": "powershell",
+            "inline": [ 
+                "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit",
+                "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Write-Output $imageState.ImageState; Start-Sleep -s 10  } else { break } }"
+            ]
+        }
+    ]
 
 ```

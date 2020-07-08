@@ -1,25 +1,25 @@
 {
     "variables": {  
-        "sp_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",          
-        "sp_Secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        "tenant_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        "subscription_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "sp_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //ID du "Servive Principal Name"         
+        "sp_Secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //Secret du "Servive Principal Name"
+        "tenant_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //Id du "Tenant AD"
+        "subscription_Id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", //ID de l'abonement
 
-        "image_Rgname":"RG-Image-Packer",
-        "image_Name":"WVD-FSlogix-VLC-Image-v0.5-test",
-        "image_location":"East US 2",
-        "image_size":"Standard_D2s_v3",        
+        "image_Rgname":"RG-Image-Packer", //Resource group de l'image
+        "image_Name":"WVD-FSlogix-VLC-Image-v0.5-test", //Nom de l'image
+        "image_location":"East US 2", //Region de l'image
+        "image_size":"Standard_D2s_v3", // Template matériel de l'image   
 
-        "Os":"Windows",
-        "Publisher":"MicrosoftWindowsDesktop",
-        "Offer":"office-365",
-        "SKU":"19h2-evd-o365pp",
+        "Os":"Windows", // Type d'OS
+        "Publisher":"MicrosoftWindowsDesktop", //Publisher de l'image
+        "Offer":"office-365", //Famille de l'OS
+        "SKU":"19h2-evd-o365pp", // Image
 
-        "dept_tag":"Engineering",
-        "task_tag":"Image deployment",
+        "dept_tag":"Engineering", //Tag 1
+        "task_tag":"Image deployment", //Tag 2
 
-        "Share_Profils_location":"storagefslogix.file.core.windows.net",
-        "Share_Profils_folder":"profiles"
+        "Share_Profils_location":"storagefslogix.file.core.windows.net", //paramétrage de FSLogix (ex:\\storagefslogix.file.core.windows.net)
+        "Share_Profils_folder":"profiles" //paramétrage de FSLogix (ex: \\storagefslogix.file.core.windows.net\profiles)
     },
     "builders": [
         {
@@ -50,7 +50,7 @@
     "provisioners": [
         {
             "type": "powershell",
-            "inline": [
+            "inline": [ // Installation du gestionnaire de package "Chocolatey"
                 "$ErrorActionPreference='Stop'",
                 "Invoke-Expression ((New-Object -TypeName net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
                 "& choco feature enable -n allowGlobalConfirmation",
@@ -59,7 +59,7 @@
         },
         {
             "type": "powershell",
-            "inline": [
+            "inline": [ // Installation de FSLogix avec "Chocolatey"
                 "$ErrorActionPreference='Stop'",
                 "& choco install fslogix",
                 "Write-Host \"fslogix Installed.\""
@@ -67,7 +67,7 @@
         },
         {
             "type": "powershell",
-            "inline": [
+            "inline": [ // Ajout de la clé de registre "Profiles" (FSLogix)
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles",
                 "Write-Host \"fslogix Profiles.\""
@@ -75,7 +75,7 @@
         },
         {
             "type": "powershell",
-            "inline": [
+            "inline": [ // Ajout d'un parametre "Enabled" de a clé de registre "Profiles" (FSLogix)
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v Enabled /t REG_DWORD /d 0x00000001 ",
                 "Write-Host \"fslogix Profiles Enabled.\""
@@ -83,7 +83,7 @@
         },
         {
             "type": "powershell",
-            "inline": [
+            "inline": [ // Ajout d'un parametre "DeleteLocalProfileWhenVHDShouldApply" de a clé de registre "Profiles" (FSLogix)
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v DeleteLocalProfileWhenVHDShouldApply /t REG_DWORD /d 0x00000001 ",
                 "Write-Host \"fslogix Profiles DeleteLocalProfileWhenVHDShouldApply.\""
@@ -91,7 +91,7 @@
         },
         {
             "type": "powershell",
-            "inline": [
+            "inline": [// Ajout d'un parametre "VHDLocations" de a clé de registre "Profiles" (FSLogix). Location du partage SMB
                 "$ErrorActionPreference='Stop'",
                 "& reg add HKLM\\SOFTWARE\\FSLogix\\Profiles /v VHDLocations /t REG_MULTI_SZ /d \\\\{{user `Share_Profils_location`}}\\{{user `Share_Profils_folder`}} ",
                 "Write-Host \"fslogix Profiles VHDLocations .\""
@@ -99,7 +99,7 @@
         },
         {
             "type":"powershell",
-            "inline":[
+            "inline":[ // Installation de VLC
                 "$ErrorActionPreference='Stop'",
                 "& choco install vlc",
                 "Write-Host \"vlc Installed.\""
@@ -107,7 +107,7 @@
         },
         {
             "type": "powershell",
-            "inline": [
+            "inline": [ // Sysprep
                 "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit",
                 "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Write-Output $imageState.ImageState; Start-Sleep -s 10  } else { break } }"
             ]

@@ -12,10 +12,10 @@ Récupérer : Application (client) ID - Password - TenantID<br/>
 Il faudrat également l'id de l'abonnement<br/>
 2 - Installer Packer<br/>
 https://www.packer.io/<br/>
-3 - Ecrire le fichier de configuration Packer <br\>
-Voir l'exemple Wvd-Image.json<br\>
+3 - Ecrire le fichier de configuration Packer <br/>
+Voir l'exemple Wvd-Image.json<br/>
 4 - Construire l'image <br/>
-Exemple : ``packer build .\Wvd-Image.json`` <br/>
+Exemple : ``packer build .\Wvd-Image.json``
 
 
 

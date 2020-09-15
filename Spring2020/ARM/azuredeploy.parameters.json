@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "hostpools_name": {
+            "value": "Host-Pool-01"
+        },
+        "lbType": {
+            "value": "BreadthFirst"
+        },
+        "tokenExpirationTime": {
+            "value": "2020-09-15T09:29:17.6505915Z"
+        },
+        "workspaces_name": {
+            "value": "Workspace-01"
+        },
+        "Numbers_of_VM": {
+            "value": 2
+        },
+        "vmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "publisherName": {
+            "value": "MicrosoftWindowsDesktop"
+        },
+        "offerName": {
+            "value": "office-365"
+        },
+        "skuName": {
+            "value": "20h1-evd-o365pp"
+        },
+        "host_name_prefix": {
+            "value": "hostVDI"
+        },
+        "Username": {
+            "value": "pierrc"
+        },
+        "pwdUser": {
+            "value": "Password123$"
+        },
+        "domainName": {
+            "value": "ma-pme.local"
+        },
+        "domainUsername": {
+            "value": "pierrc@ma-pme.local"
+        },
+        "domainUsernamePassword": {
+            "value": "Password123$"
+        },
+        "virtualNetworkResourceGroupName": {
+            "value": "RG-AD-WVD"
+        },
+        "virtualNetworkName": {
+            "value": "AD-WVD-vnet"
+        },
+        "subnetName": {
+            "value": "subnet-test"
+        }
+    }
+}

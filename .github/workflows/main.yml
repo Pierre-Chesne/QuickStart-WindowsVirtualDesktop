@@ -1,0 +1,16 @@
+- name: Workflow deploiement d'un Host Pool WVD
+  on:
+    push:
+      branches: [master]
+      paths:
+      - "Spring2020/ARM/**"
+
+  jobs:
+    build-and-deploy:
+      name: deploiement dans Azure
+      runs-on: ubuntu-latest
+      steps:
+      - name: Azure Login Az Cli
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}

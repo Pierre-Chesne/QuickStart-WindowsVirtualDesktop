@@ -37,6 +37,6 @@ jobs:
       uses: Azure/github-actions/arm@master
       env:
         AZURE_RESOURCE_GROUP: RG-WVD-Hosts
-        AZURE_TEMPLATE_LOCATION: ./Spring/ARM/azuredeploy.json
-        AZURE_TEMPLATE_PARAM_LOCATION: ./Spring/ARM/azuredeploy.parameters.json
+        AZURE_TEMPLATE_LOCATION: ./Spring2020/ARM/azuredeploy.json
+        AZURE_TEMPLATE_PARAM_LOCATION: ./Spring2020/ARM/azuredeploy.parameters.json
         

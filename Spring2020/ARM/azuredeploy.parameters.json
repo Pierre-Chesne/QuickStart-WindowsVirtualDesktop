@@ -9,7 +9,7 @@
             "value": "BreadthFirst"
         },
         "tokenExpirationTime": {
-            "value": "2020-09-23T09:05:28.2556636Z"
+            "value": "2020-09-23T12:01:10.5206206Z"
         },
         "workspaces_name": {
             "value": "Workspace-01"
@@ -36,7 +36,13 @@
             "value": "pierrc"
         },
         "pwdUser": {
-            "value": "Password123$"
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/45d70f51-2e63-4daa-8870-27e468ba9baa/resourceGroups/RG-AD-WVD/providers/Microsoft.KeyVault/vaults/kv-pierrc"
+                },
+                "secretName": "pwdpierrc"
+            }
+            
         },
         "domainName": {
             "value": "ma-pme.local"
@@ -45,7 +51,13 @@
             "value": "pierrc@ma-pme.local"
         },
         "domainUsernamePassword": {
-            "value": "Password123$"
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/45d70f51-2e63-4daa-8870-27e468ba9baa/resourceGroups/RG-AD-WVD/providers/Microsoft.KeyVault/vaults/kv-pierrc"
+                },
+                "secretName": "pwdpierrc"
+            }
+            
         },
         "virtualNetworkResourceGroupName": {
             "value": "RG-AD-WVD"
